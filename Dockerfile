@@ -8,4 +8,8 @@ RUN pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple
 
 COPY . .
 
-# CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"] 
+WORKDIR /app/src/app
+
+EXPOSE 8080
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

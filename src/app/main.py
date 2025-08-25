@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import os
 import base64
+import json
 from vlm_caption import product_description
 from llm_generation import generate_marketing_content
 
@@ -10,7 +11,7 @@ app = FastAPI()
 @app.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
     if not file.content_type.startswith("image/"):
-        return JSONResponse({"error": "فایل باید تصویر باشد"}, status_code=400)
+        return JSONResponse({"Error": "File must be an image"}, status_code=400)
     
     # Save image to uploads folder
     os.makedirs("src/uploads", exist_ok=True)
@@ -31,20 +32,30 @@ async def upload_image(file: UploadFile = File(...)):
         # Generate marketing content with LLM
         llm_result = generate_marketing_content(vlm_result)
         
-        return {
-            llm_result
-        }
+        # Convert string to JSON if needed
+        try:
+            if isinstance(llm_result, str):
+                # Remove markdown formatting if present
+                cleaned_result = llm_result.strip()
+                if cleaned_result.startswith("```json"):
+                    cleaned_result = cleaned_result[7:]  # Remove ```json
+                if cleaned_result.endswith("```"):
+                    cleaned_result = cleaned_result[:-3]  # Remove ```
+                cleaned_result = cleaned_result.strip()
+                
+                result = json.loads(cleaned_result)
+            else:
+                result = llm_result
+            return JSONResponse(content=result)
+        except json.JSONDecodeError:
+            return JSONResponse(content={"raw_result": llm_result})
         
     except Exception as e:
         return JSONResponse(
-            {"error": f"خطا در تحلیل تصویر: {str(e)}"}, 
+            {"Error": f"Error in image analysis: {str(e)}"}, 
             status_code=500
         )
-
+    
 @app.get("/")
 async def root():
-    return {"message": "برای آپلود و تحلیل تصویر از POST /upload استفاده کنید"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return {"message": "Use POST /upload to upload and analyze an image"}

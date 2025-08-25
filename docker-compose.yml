@@ -2,7 +2,23 @@ services:
   ai-product-assistant:
     build: .
     container_name: ai-product-content-assistant
+    ports:
+      - "8080:8080"
     volumes:
-      - ./src:/app/src
-      - ./app:/app/app
-    command: tail -f /dev/null
+      - images_upload:/app/src/
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  images_upload:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./src/uploads
