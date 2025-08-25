@@ -1,4 +1,4 @@
-# Intelligent Product Analysis Assistant
+# Ai Product Content Assistant
 
 ## Project Overview
 
