@@ -36,7 +36,7 @@ This project is an AI-powered service that utilizes **Vision Language Models (VL
     ├── app/
     │   ├── main.py            # Main FastAPI server
     │   ├── vlm_caption.py     # Image analysis module
-    │   └── llm_generation.py # Content generation module
+    │   └── llm_generation.py  # Content generation module
     ├── demo/                  # Sample files
     └── uploads/               # Image upload folder
 ```
